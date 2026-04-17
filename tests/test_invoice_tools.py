@@ -25,8 +25,14 @@ def test_create_invoice_rejects_bad_vat_rate(client):
 def test_create_invoice_rejects_invalid_tenant(client):
     request = {**VALID_INVOICE_REQUEST, "tenant_id": INVALID_TENANT_ID}
     response = client.post("/tools/create_purchase_invoice", json=request)
-    assert response.status_code == 500
+    assert response.status_code == 404
     assert response.json()["error"]["code"] == "TENANT_ERROR"
+
+
+def test_create_invoice_rejects_invalid_date_format(client):
+    request = {**VALID_INVOICE_REQUEST, "invoice_date": "not-a-date"}
+    response = client.post("/tools/create_purchase_invoice", json=request)
+    assert response.status_code == 422
 
 
 def test_create_invoice_valid_data_reaches_erpnext(client):

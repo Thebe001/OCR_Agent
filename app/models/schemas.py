@@ -1,9 +1,9 @@
 """Pydantic schemas and standard MCP response helpers."""
 
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from typing import Any, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 def utc_now() -> str:
@@ -76,6 +76,19 @@ class CreatePurchaseInvoiceInput(BaseModel):
     total_gross: float
     vat_rate: float
     confirmed: bool
+
+    @field_validator("invoice_date", "due_date", mode="before")
+    @classmethod
+    def _validate_iso_date(cls, value):
+        if value in (None, ""):
+            return value
+        if not isinstance(value, str):
+            raise ValueError("Date must be provided as YYYY-MM-DD.")
+        try:
+            date.fromisoformat(value)
+        except ValueError as exc:
+            raise ValueError("Date must be provided as YYYY-MM-DD.") from exc
+        return value
 
 
 def build_success_response(

@@ -3,6 +3,7 @@ const state = {
   originalData: null,
   lineItems: [],
   lastRequestedLanguage: "auto",
+  isBusy: false,
 };
 
 const MEMORY_KEY = "ocrCorrectionMemoryV1";
@@ -38,6 +39,12 @@ const els = {
 function setStatus(message, isError = false) {
   els.status.textContent = message;
   els.status.style.color = isError ? "#9d2929" : "";
+}
+
+function setBusy(isBusy) {
+  state.isBusy = isBusy;
+  els.readBtn.disabled = isBusy;
+  els.createBtn.disabled = isBusy;
 }
 
 function readFileAsBase64(file) {
@@ -571,6 +578,7 @@ els.suggestionBox.addEventListener("click", (event) => {
 });
 
 els.readBtn.addEventListener("click", async () => {
+  if (state.isBusy) return;
   const file = els.file.files?.[0];
   if (!file) {
     setStatus("Choose a file first.", true);
@@ -578,7 +586,7 @@ els.readBtn.addEventListener("click", async () => {
   }
 
   try {
-    els.readBtn.disabled = true;
+    setBusy(true);
     setStatus("Running OCR...");
     state.lastRequestedLanguage = els.ocrLanguage.value;
     const imageData = await readFileAsBase64(file);
@@ -608,19 +616,20 @@ els.readBtn.addEventListener("click", async () => {
   } catch (error) {
     setStatus(error.message, true);
   } finally {
-    els.readBtn.disabled = false;
+    setBusy(false);
   }
 });
 
 els.createBtn.addEventListener("click", async () => {
+  if (state.isBusy) return;
   try {
+    setBusy(true);
     const check = analyzeAndHighlight(true);
     if (check.blocking) {
       setStatus("Please fix the highlighted fields before creating the draft.", true);
       return;
     }
 
-    els.createBtn.disabled = true;
     setStatus("Creating draft...");
     const result = await postJson("/tools/create_purchase_invoice", collectInvoicePayload());
     persistCorrectionsFromCurrentForm();
@@ -631,7 +640,7 @@ els.createBtn.addEventListener("click", async () => {
     els.warning.textContent = `${error.message} The data stays on screen.`;
     setStatus("Creation failed for now.", true);
   } finally {
-    els.createBtn.disabled = false;
+    setBusy(false);
   }
 });
 

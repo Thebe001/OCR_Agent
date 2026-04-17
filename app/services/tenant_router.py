@@ -8,7 +8,7 @@ def resolve_tenant(tenant_id: str) -> TenantConfig:
     if not tenant_id or not tenant_id.strip():
         raise MCPError(
             ErrorCode.TENANT_ERROR,
-            "System configuration error. Please contact your administrator.",
+            "Tenant ID is required.",
             "tenant_id is missing",
         )
 
@@ -17,7 +17,7 @@ def resolve_tenant(tenant_id: str) -> TenantConfig:
     if tenant is None:
         raise MCPError(
             ErrorCode.TENANT_ERROR,
-            "System configuration error. Please contact your administrator.",
+            "Unknown tenant. Please verify the tenant ID.",
             f"tenant '{clean_tenant_id}' was not found or is inactive",
         )
     return tenant

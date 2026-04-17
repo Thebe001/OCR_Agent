@@ -1,7 +1,6 @@
 """OCR service with mock mode, optional PaddleOCR, and optional Azure hook."""
 
 import base64
-import hashlib
 import importlib.util
 import io
 import logging
@@ -972,7 +971,7 @@ class OCRService:
                 continue
             if len(cleaned) >= 2 and not any(word in cleaned.lower() for word in skip):
                 return cleaned
-        return lines[0] if lines else ""
+        return ""
 
     def _guess_address(self, lines: list[str]) -> str:
         for line in lines[:10]:
@@ -1241,7 +1240,7 @@ class OCRService:
         return "unknown"
 
     async def _mock_extract(self, image_data: str) -> dict:
-        scenario = int(hashlib.md5(image_data.encode()[:100]).hexdigest(), 16) % 6
+        scenario = self._resolve_mock_scenario(image_data)
         data = [
             self._standard_invoice(),
             self._unknown_supplier_invoice(),
@@ -1252,6 +1251,23 @@ class OCRService:
         ][scenario]
         data["mock_scenario"] = scenario
         return data
+
+    def _resolve_mock_scenario(self, image_data: str) -> int:
+        override = os.getenv("OCR_MOCK_SCENARIO", "").strip().lower()
+        if not override:
+            return 0
+
+        mapping = {
+            "standard": 0,
+            "unknown_supplier": 1,
+            "mixed_vat": 2,
+            "low_confidence": 3,
+            "no_items": 4,
+            "wrong_totals": 5,
+        }
+        if override.isdigit():
+            return max(0, min(5, int(override)))
+        return mapping.get(override, 0)
 
     def _standard_invoice(self) -> dict:
         return {

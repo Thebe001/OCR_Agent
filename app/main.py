@@ -13,6 +13,7 @@ from fastapi.staticfiles import StaticFiles
 from app.config.settings import settings
 from app.models.errors import ErrorCode, MCPError
 from app.models.schemas import build_error_response
+from app.services.erpnext_client import ERPNextClient
 from app.tools import invoice_tools, item_tools, ocr_tools, supplier_tools
 
 logging.basicConfig(
@@ -26,7 +27,10 @@ logger = logging.getLogger("floravi-mcp")
 async def lifespan(app: FastAPI):
     logger.info("Floravi MCP Server starting")
     logger.info("Python executable: %s", sys.executable)
+    if settings.app_env.lower() == "production" and settings.allowed_origins.strip() == "*":
+        logger.warning("ALLOWED_ORIGINS is '*' in production. Restrict it before deploying.")
     yield
+    await ERPNextClient.close_shared_client()
     logger.info("Floravi MCP Server stopping")
 
 
@@ -39,7 +43,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[origin.strip() for origin in settings.allowed_origins.split(",")],
+    allow_origins=[origin.strip() for origin in settings.allowed_origins.split(",") if origin.strip()] or ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -64,9 +68,9 @@ async def mcp_error_handler(request: Request, exc: MCPError):
     status_map = {
         ErrorCode.VALIDATION_ERROR: 400,
         ErrorCode.NOT_FOUND: 404,
-        ErrorCode.AUTH_ERROR: 500,
+        ErrorCode.AUTH_ERROR: 401,
         ErrorCode.PERMISSION_ERROR: 403,
-        ErrorCode.TENANT_ERROR: 500,
+        ErrorCode.TENANT_ERROR: 404,
         ErrorCode.RATE_LIMIT: 429,
         ErrorCode.ERPNEXT_ERROR: 502,
         ErrorCode.AI_SERVICE_ERROR: 502,

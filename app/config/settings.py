@@ -1,37 +1,39 @@
 """Application settings loaded from environment variables."""
 
-import os
-from dataclasses import dataclass
-
-from dotenv import load_dotenv
-
-load_dotenv()
+from pydantic import Field, field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-def _bool_env(name: str, default: bool) -> bool:
-    value = os.getenv(name)
-    if value is None:
-        return default
-    return value.strip().lower() in {"1", "true", "yes", "y", "on", "debug", "development"}
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
+    app_env: str = Field(default="development")
+    app_port: int = Field(default=8000)
+    debug: bool = Field(default=True)
+    log_level: str = Field(default="DEBUG")
 
-@dataclass(frozen=True)
-class Settings:
-    app_env: str = os.getenv("APP_ENV", "development")
-    app_port: int = int(os.getenv("APP_PORT", "8000"))
-    debug: bool = _bool_env("DEBUG", True)
-    log_level: str = os.getenv("LOG_LEVEL", "DEBUG")
+    erpnext_base_url: str = Field(default="http://localhost:8080")
+    erpnext_api_key: str = Field(default="")
+    erpnext_api_secret: str = Field(default="")
 
-    erpnext_base_url: str = os.getenv("ERPNEXT_BASE_URL", "http://localhost:8080")
-    erpnext_api_key: str = os.getenv("ERPNEXT_API_KEY", "")
-    erpnext_api_secret: str = os.getenv("ERPNEXT_API_SECRET", "")
+    azure_ocr_endpoint: str = Field(default="")
+    azure_ocr_key: str = Field(default="")
+    ocr_provider: str = Field(default="mock")
 
-    azure_ocr_endpoint: str = os.getenv("AZURE_OCR_ENDPOINT", "")
-    azure_ocr_key: str = os.getenv("AZURE_OCR_KEY", "")
-    ocr_provider: str = os.getenv("OCR_PROVIDER", "mock").strip().lower()
+    default_tenant_id: str = Field(default="test-florist-001")
+    allowed_origins: str = Field(default="*")
 
-    default_tenant_id: str = os.getenv("DEFAULT_TENANT_ID", "test-florist-001")
-    allowed_origins: str = os.getenv("ALLOWED_ORIGINS", "*")
+    @field_validator("app_env", "log_level", "erpnext_base_url", "azure_ocr_endpoint", "ocr_provider", "default_tenant_id", "allowed_origins", mode="before")
+    @classmethod
+    def _strip_strings(cls, value):
+        if isinstance(value, str):
+            return value.strip()
+        return value
+
+    @field_validator("ocr_provider")
+    @classmethod
+    def _normalize_provider(cls, value: str) -> str:
+        return value.lower()
 
 
 settings = Settings()

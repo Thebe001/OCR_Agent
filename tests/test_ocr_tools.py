@@ -1,3 +1,5 @@
+import base64
+
 from tests.conftest import INVALID_TENANT_ID, VALID_OCR_REQUEST
 
 
@@ -21,12 +23,20 @@ def test_process_ocr_document_rejects_empty_image(client):
 def test_process_ocr_document_rejects_invalid_tenant(client):
     request = {**VALID_OCR_REQUEST, "tenant_id": INVALID_TENANT_ID}
     response = client.post("/tools/process_ocr_document", json=request)
-    assert response.status_code == 500
+    assert response.status_code == 404
     assert response.json()["error"]["code"] == "TENANT_ERROR"
 
 
 def test_process_ocr_document_rejects_non_invoice(client):
     request = {**VALID_OCR_REQUEST, "document_type": "receipt"}
+    response = client.post("/tools/process_ocr_document", json=request)
+    assert response.status_code == 400
+    assert response.json()["error"]["code"] == "VALIDATION_ERROR"
+
+
+def test_process_ocr_document_rejects_oversized_image(client):
+    oversized = base64.b64encode(b"x" * (10 * 1024 * 1024 + 1)).decode()
+    request = {**VALID_OCR_REQUEST, "image_data": oversized}
     response = client.post("/tools/process_ocr_document", json=request)
     assert response.status_code == 400
     assert response.json()["error"]["code"] == "VALIDATION_ERROR"

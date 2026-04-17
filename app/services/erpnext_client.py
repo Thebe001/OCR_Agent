@@ -11,6 +11,8 @@ from app.models.errors import ErrorCode, MCPError
 
 class ERPNextClient:
     MAX_RETRIES = 3
+    _shared_client: Optional[httpx.AsyncClient] = None
+    _shared_client_lock: Optional[asyncio.Lock] = None
 
     def __init__(self, tenant: TenantConfig):
         self.tenant = tenant
@@ -20,6 +22,28 @@ class ERPNextClient:
             "Content-Type": "application/json",
             "Accept": "application/json",
         }
+
+    @classmethod
+    async def _get_shared_client(cls) -> httpx.AsyncClient:
+        if cls._shared_client is not None:
+            return cls._shared_client
+
+        if cls._shared_client_lock is None:
+            cls._shared_client_lock = asyncio.Lock()
+
+        async with cls._shared_client_lock:
+            if cls._shared_client is None:
+                cls._shared_client = httpx.AsyncClient(
+                    timeout=20.0,
+                    limits=httpx.Limits(max_connections=20, max_keepalive_connections=10, keepalive_expiry=30.0),
+                )
+        return cls._shared_client
+
+    @classmethod
+    async def close_shared_client(cls) -> None:
+        if cls._shared_client is not None:
+            await cls._shared_client.aclose()
+            cls._shared_client = None
 
     async def get_resource(
         self,
@@ -73,14 +97,14 @@ class ERPNextClient:
     ) -> dict:
         for attempt in range(self.MAX_RETRIES + 1):
             try:
-                async with httpx.AsyncClient(timeout=20.0) as client:
-                    response = await client.request(
-                        method,
-                        url,
-                        headers=self.headers,
-                        params=params,
-                        json=json_data,
-                    )
+                client = await self._get_shared_client()
+                response = await client.request(
+                    method,
+                    url,
+                    headers=self.headers,
+                    params=params,
+                    json=json_data,
+                )
             except (httpx.ConnectError, httpx.TimeoutException) as exc:
                 raise MCPError(
                     ErrorCode.ERPNEXT_ERROR,
