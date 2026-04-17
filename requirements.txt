@@ -1,0 +1,20 @@
+fastapi==0.111.0
+uvicorn==0.30.1
+pydantic==2.7.4
+pydantic-settings==2.3.4
+httpx==0.27.0
+python-dotenv==1.0.1
+loguru==0.7.2
+pytest==8.2.2
+pytest-asyncio==0.23.7
+python-multipart==0.0.9
+PyMuPDF==1.27.2.2
+rapidocr-onnxruntime==1.4.4
+
+# Enable when Azure OCR is available.
+# azure-ai-documentintelligence==1.0.0b3
+
+# Enable for powerful local open-source OCR.
+# Recommended Windows/Python 3.11 stable combination:
+# paddlepaddle==2.6.2
+# paddleocr==2.10.0

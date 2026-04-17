@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Floravi Test Invoices</title>
+  <style>
+    body{font-family:Arial,sans-serif;max-width:860px;margin:40px auto;color:#222}
+    h1{color:#246b3b}.card{border:1px solid #ddd;padding:16px;margin:12px 0;border-radius:6px}
+    a{color:#246b3b;font-weight:bold}
+  </style>
+</head>
+<body>
+  <h1>Floravi Test Invoices</h1>
+  <p>Open an invoice, then print to PDF for OCR testing.</p>
+  <div class="card"><a href="invoice_01_standard.html">Invoice 01 - Standard</a><p>Known supplier, three flower lines, 7% VAT.</p></div>
+  <div class="card"><a href="invoice_02_unknown_supplier.html">Invoice 02 - Unknown Supplier</a><p>Supplier should not match in ERPNext.</p></div>
+  <div class="card"><a href="invoice_03_mixed_vat.html">Invoice 03 - Mixed VAT</a><p>Flowers at 7%, accessories at 19%.</p></div>
+  <div class="card"><a href="invoice_04_blurry.html">Invoice 04 - Blurry</a><p>Low-confidence OCR scenario.</p></div>
+  <div class="card"><a href="invoice_05_no_items.html">Invoice 05 - No Items</a><p>Header and totals only.</p></div>
+  <div class="card"><a href="invoice_06_wrong_totals.html">Invoice 06 - Wrong Totals</a><p>Net + VAT does not equal gross.</p></div>
+</body>
+</html>

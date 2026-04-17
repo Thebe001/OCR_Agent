@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Floravi Invoice Assistant</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="intro">
+        <p class="eyebrow">Floravi</p>
+        <h1>Invoice Assistant</h1>
+        <p>
+          Upload a supplier invoice, I will read it with OCR and prepare the data
+          before creating the draft.
+        </p>
+      </section>
+
+      <section class="workspace" aria-label="Invoice assistant workspace">
+        <div class="panel upload-panel">
+          <h2>1. Upload invoice</h2>
+          <p class="muted">Accepted formats: JPEG, PNG, or PDF.</p>
+
+          <label class="dropzone" for="invoiceFile">
+            <span id="fileLabel">Choose an invoice</span>
+            <input id="invoiceFile" type="file" accept="image/*,.pdf" />
+          </label>
+
+          <div class="field-row">
+            <label for="tenantId">Tenant</label>
+            <input id="tenantId" type="text" value="test-florist-001" />
+          </div>
+
+          <div class="field-row">
+            <label for="ocrLanguage">OCR language</label>
+            <select id="ocrLanguage">
+              <option value="auto" selected>Auto detect</option>
+              <option value="en">English</option>
+              <option value="de">German</option>
+            </select>
+          </div>
+
+          <div class="actions">
+            <button id="readInvoiceBtn" type="button">Read invoice</button>
+            <button id="resetBtn" type="button" class="secondary">Reset</button>
+          </div>
+
+          <p id="statusText" class="status" role="status">Ready.</p>
+          <p id="detectedLanguage" class="detected-language hidden"></p>
+        </div>
+
+        <div class="panel result-panel">
+          <h2>2. Review</h2>
+          <div id="emptyState" class="empty-state">
+            The extracted data will appear here after OCR.
+          </div>
+
+          <form id="invoiceForm" class="hidden">
+            <div class="review-header">
+              <div>
+                <p class="review-kicker">Review before creating the draft</p>
+                <p class="review-subtitle">Check supplier details, amounts, VAT, and line items below.</p>
+              </div>
+              <div id="qualityGate" class="quality-gate hidden" aria-live="polite"></div>
+            </div>
+
+            <div id="warningBox" class="warning hidden"></div>
+            <div id="suggestionBox" class="suggestion-box hidden"></div>
+
+            <div class="review-grid">
+              <section class="review-card">
+                <h3>Invoice details</h3>
+                <div class="grid grid-2">
+                  <label>
+                    Supplier
+                    <input id="supplierName" name="supplierName" type="text" />
+                  </label>
+                  <label>
+                    Invoice number
+                    <input id="invoiceNumber" name="invoiceNumber" type="text" />
+                  </label>
+                  <label>
+                    Invoice date
+                    <input id="invoiceDate" name="invoiceDate" type="date" />
+                  </label>
+                  <label>
+                    Due date
+                    <input id="dueDate" name="dueDate" type="date" />
+                  </label>
+                  <label>
+                    Currency
+                    <input id="currency" name="currency" type="text" />
+                  </label>
+                  <label>
+                    VAT %
+                    <input id="vatRate" name="vatRate" type="number" step="1" />
+                    <small id="vatHint" class="field-hint hidden"></small>
+                  </label>
+                </div>
+              </section>
+
+              <section class="review-card review-card-amounts">
+                <h3>Amounts</h3>
+                <div class="grid grid-3 compact-grid">
+                  <label>
+                    Net amount
+                    <input id="totalNet" name="totalNet" type="number" step="0.01" />
+                  </label>
+                  <label>
+                    VAT amount
+                    <input id="totalVat" name="totalVat" type="number" step="0.01" />
+                  </label>
+                  <label>
+                    Gross amount
+                    <input id="totalGross" name="totalGross" type="number" step="0.01" />
+                  </label>
+                </div>
+              </section>
+            </div>
+
+            <section class="review-card review-card-items">
+              <h3>Line items</h3>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Description</th>
+                      <th>Qty</th>
+                      <th>Unit</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody id="lineItemsBody"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <div class="actions footer-actions">
+              <button id="createDraftBtn" type="button">Create draft</button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

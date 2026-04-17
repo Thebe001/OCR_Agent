@@ -1,0 +1,128 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Floravi MCP Server",
+    "description": "MCP tools for the Floravi Invoice OCR Agent",
+    "version": "0.1.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "Local development"
+    }
+  ],
+  "paths": {
+    "/tools/process_ocr_document": {
+      "post": {
+        "operationId": "processOCRDocument",
+        "summary": "Extract data from a supplier invoice image using OCR",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["tenant_id", "image_data", "document_type"],
+                "properties": {
+                  "tenant_id": { "type": "string" },
+                  "image_data": { "type": "string" },
+                  "document_type": { "type": "string", "enum": ["invoice", "receipt", "delivery_note"] },
+                  "language": { "type": "string", "enum": ["de", "en", "fr"], "default": "de" },
+                  "vendor_id": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "OCR extraction result" } }
+      }
+    },
+    "/tools/validate_supplier": {
+      "post": {
+        "operationId": "validateSupplier",
+        "summary": "Validate a supplier in ERPNext",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["tenant_id", "supplier_name"],
+                "properties": {
+                  "tenant_id": { "type": "string" },
+                  "supplier_name": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Supplier validation result" } }
+      }
+    },
+    "/tools/validate_items": {
+      "post": {
+        "operationId": "validateItems",
+        "summary": "Validate invoice line items in ERPNext",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["tenant_id", "items"],
+                "properties": {
+                  "tenant_id": { "type": "string" },
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["description"],
+                      "properties": {
+                        "description": { "type": "string" },
+                        "quantity": { "type": "number" },
+                        "unit_price": { "type": "number" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Item validation result" } }
+      }
+    },
+    "/tools/create_purchase_invoice": {
+      "post": {
+        "operationId": "createPurchaseInvoice",
+        "summary": "Create a draft purchase invoice in ERPNext",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["tenant_id", "supplier_name", "invoice_number", "invoice_date", "currency", "line_items", "total_net", "total_vat", "total_gross", "vat_rate", "confirmed"],
+                "properties": {
+                  "tenant_id": { "type": "string" },
+                  "supplier_name": { "type": "string" },
+                  "invoice_number": { "type": "string" },
+                  "invoice_date": { "type": "string" },
+                  "due_date": { "type": "string" },
+                  "currency": { "type": "string", "default": "EUR" },
+                  "line_items": { "type": "array", "items": { "type": "object" } },
+                  "total_net": { "type": "number" },
+                  "total_vat": { "type": "number" },
+                  "total_gross": { "type": "number" },
+                  "vat_rate": { "type": "number" },
+                  "confirmed": { "type": "boolean" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Draft invoice created" } }
+      }
+    }
+  }
+}
