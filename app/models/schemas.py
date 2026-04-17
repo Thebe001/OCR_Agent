@@ -67,7 +67,7 @@ class CreatePurchaseInvoiceInput(BaseModel):
     tenant_id: str
     supplier_name: str
     invoice_number: str
-    invoice_date: str
+    invoice_date: str = Field(strict=True)
     due_date: Optional[str] = None
     currency: str = "EUR"
     line_items: list[InvoiceLineItem]
@@ -77,13 +77,27 @@ class CreatePurchaseInvoiceInput(BaseModel):
     vat_rate: float
     confirmed: bool
 
-    @field_validator("invoice_date", "due_date", mode="before")
+    @field_validator("invoice_date", mode="before")
+    @classmethod
+    def _reject_empty_invoice_date(cls, value):
+        if value is None:
+            return value
+        if isinstance(value, str) and not value.strip():
+            raise ValueError("Date must be provided as YYYY-MM-DD.")
+        return value
+
+    @field_validator("due_date", mode="before")
+    @classmethod
+    def _normalize_empty_due_date(cls, value):
+        if isinstance(value, str) and not value.strip():
+            return None
+        return value
+
+    @field_validator("invoice_date", "due_date", mode="after")
     @classmethod
     def _validate_iso_date(cls, value):
-        if value in (None, ""):
+        if value is None:
             return value
-        if not isinstance(value, str):
-            raise ValueError("Date must be provided as YYYY-MM-DD.")
         try:
             date.fromisoformat(value)
         except ValueError as exc:

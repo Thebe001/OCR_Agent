@@ -1,6 +1,7 @@
 """Small async ERPNext REST client."""
 
 import asyncio
+import threading
 from typing import Any, Optional
 
 import httpx
@@ -12,11 +13,13 @@ from app.models.errors import ErrorCode, MCPError
 class ERPNextClient:
     MAX_RETRIES = 3
     _shared_client: Optional[httpx.AsyncClient] = None
-    _shared_client_lock: Optional[asyncio.Lock] = None
+    _shared_client_guard = threading.Lock()
 
     def __init__(self, tenant: TenantConfig):
         self.tenant = tenant
         self.base_url = tenant.site_url.rstrip("/")
+        # The shared AsyncClient is intentionally stateless; auth headers remain tenant-scoped
+        # and are injected per request to preserve multi-tenant isolation.
         self.headers = {
             "Authorization": f"token {tenant.api_key}:{tenant.api_secret}",
             "Content-Type": "application/json",
@@ -24,19 +27,20 @@ class ERPNextClient:
         }
 
     @classmethod
-    async def _get_shared_client(cls) -> httpx.AsyncClient:
+    async def initialize_shared_client(cls) -> None:
         if cls._shared_client is not None:
-            return cls._shared_client
-
-        if cls._shared_client_lock is None:
-            cls._shared_client_lock = asyncio.Lock()
-
-        async with cls._shared_client_lock:
+            return
+        with cls._shared_client_guard:
             if cls._shared_client is None:
                 cls._shared_client = httpx.AsyncClient(
                     timeout=20.0,
                     limits=httpx.Limits(max_connections=20, max_keepalive_connections=10, keepalive_expiry=30.0),
                 )
+
+    @classmethod
+    async def _get_shared_client(cls) -> httpx.AsyncClient:
+        if cls._shared_client is None:
+            await cls.initialize_shared_client()
         return cls._shared_client
 
     @classmethod

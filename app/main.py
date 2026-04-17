@@ -27,6 +27,7 @@ logger = logging.getLogger("floravi-mcp")
 async def lifespan(app: FastAPI):
     logger.info("Floravi MCP Server starting")
     logger.info("Python executable: %s", sys.executable)
+    await ERPNextClient.initialize_shared_client()
     if settings.app_env.lower() == "production" and settings.allowed_origins.strip() == "*":
         logger.warning("ALLOWED_ORIGINS is '*' in production. Restrict it before deploying.")
     yield

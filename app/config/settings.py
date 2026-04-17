@@ -23,7 +23,19 @@ class Settings(BaseSettings):
     default_tenant_id: str = Field(default="test-florist-001")
     allowed_origins: str = Field(default="*")
 
-    @field_validator("app_env", "log_level", "erpnext_base_url", "azure_ocr_endpoint", "ocr_provider", "default_tenant_id", "allowed_origins", mode="before")
+    @field_validator(
+        "app_env",
+        "log_level",
+        "erpnext_base_url",
+        "erpnext_api_key",
+        "erpnext_api_secret",
+        "azure_ocr_endpoint",
+        "azure_ocr_key",
+        "ocr_provider",
+        "default_tenant_id",
+        "allowed_origins",
+        mode="before",
+    )
     @classmethod
     def _strip_strings(cls, value):
         if isinstance(value, str):

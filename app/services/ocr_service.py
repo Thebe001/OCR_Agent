@@ -1,6 +1,7 @@
 """OCR service with mock mode, optional PaddleOCR, and optional Azure hook."""
 
 import base64
+import hashlib
 import importlib.util
 import io
 import logging
@@ -1255,7 +1256,7 @@ class OCRService:
     def _resolve_mock_scenario(self, image_data: str) -> int:
         override = os.getenv("OCR_MOCK_SCENARIO", "").strip().lower()
         if not override:
-            return 0
+            return int(hashlib.md5(image_data.encode()[:100]).hexdigest(), 16) % 6
 
         mapping = {
             "standard": 0,

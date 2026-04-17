@@ -35,6 +35,18 @@ def test_create_invoice_rejects_invalid_date_format(client):
     assert response.status_code == 422
 
 
+def test_create_invoice_rejects_empty_invoice_date(client):
+    request = {**VALID_INVOICE_REQUEST, "invoice_date": ""}
+    response = client.post("/tools/create_purchase_invoice", json=request)
+    assert response.status_code == 422
+
+
+def test_create_invoice_allows_empty_due_date_as_null(client):
+    request = {**VALID_INVOICE_REQUEST, "due_date": ""}
+    response = client.post("/tools/create_purchase_invoice", json=request)
+    assert response.status_code in {200, 502}
+
+
 def test_create_invoice_valid_data_reaches_erpnext(client):
     response = client.post("/tools/create_purchase_invoice", json=VALID_INVOICE_REQUEST)
     assert response.status_code in {200, 502}
