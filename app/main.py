@@ -14,7 +14,7 @@ from app.config.settings import settings
 from app.models.errors import ErrorCode, MCPError
 from app.models.schemas import build_error_response
 from app.services.erpnext_client import ERPNextClient
-from app.tools import invoice_tools, item_tools, ocr_tools, supplier_tools
+from app.tools import daily_close_tools, invoice_tools, item_tools, ocr_tools, supplier_tools
 
 logging.basicConfig(
     level=getattr(logging, settings.log_level.upper(), logging.INFO),
@@ -113,6 +113,7 @@ async def root():
         "version": "0.1.0",
         "environment": settings.app_env,
         "agent_ui": "/agent",
+        "daily_close_ui": "/daily-close-agent",
         "api_docs": "/docs",
     }
 
@@ -120,6 +121,11 @@ async def root():
 @app.get("/agent", include_in_schema=False)
 async def agent_ui():
     return FileResponse("app/static/index.html")
+
+
+@app.get("/daily-close-agent", include_in_schema=False)
+async def daily_close_agent_ui():
+    return FileResponse("app/static/daily_close.html")
 
 
 @app.get("/health", tags=["Health"])
@@ -132,7 +138,7 @@ async def health_check():
         "ocr_configured": bool(settings.azure_ocr_endpoint),
         "ocr_provider": settings.ocr_provider,
         "default_tenant": settings.default_tenant_id,
-        "tools_registered": 4,
+        "tools_registered": 8,
     }
 
 
@@ -140,3 +146,4 @@ app.include_router(ocr_tools.router)
 app.include_router(supplier_tools.router)
 app.include_router(item_tools.router)
 app.include_router(invoice_tools.router)
+app.include_router(daily_close_tools.router)

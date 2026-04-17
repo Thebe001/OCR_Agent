@@ -1,0 +1,9 @@
+[
+  {"item_code": "ROSE-RED-001", "item_name": "Red Rose Bundle", "warehouse": "Floravi Shop 1", "actual_qty": 50, "reserved_qty": 0},
+  {"item_code": "TULIP-YLW-003", "item_name": "Yellow Tulip", "warehouse": "Floravi Shop 1", "actual_qty": 30, "reserved_qty": 5},
+  {"item_code": "LILY-WHT-002", "item_name": "White Lily", "warehouse": "Floravi Shop 1", "actual_qty": 15, "reserved_qty": 0},
+  {"item_code": "WRAP-GIFT-001", "item_name": "Gift Wrapping", "warehouse": "Floravi Shop 1", "actual_qty": 100, "reserved_qty": 0},
+  {"item_code": "ORCH-PNK-005", "item_name": "Pink Orchid", "warehouse": "Floravi Shop 1", "actual_qty": 8, "reserved_qty": 2},
+  {"item_code": "VASE-CER-002", "item_name": "Ceramic Vase", "warehouse": "Floravi Shop 1", "actual_qty": 12, "reserved_qty": 0},
+  {"item_code": "SUNF-LRG-004", "item_name": "Large Sunflower", "warehouse": "Floravi Shop 1", "actual_qty": -2, "reserved_qty": 0}
+]

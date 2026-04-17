@@ -1,0 +1,86 @@
+[
+  {
+    "invoice_id": "POS-INV-2025-001",
+    "posting_date": "2025-04-17",
+    "posting_time": "09:15:00",
+    "customer": "Walk-in Customer",
+    "cashier": "Marie Dupont",
+    "pos_profile": "Floravi Shop 1",
+    "items": [
+      {"item_code": "ROSE-RED-001", "item_name": "Red Rose Bundle", "qty": 5, "rate": 4.5, "amount": 22.5},
+      {"item_code": "TULIP-YLW-003", "item_name": "Yellow Tulip", "qty": 10, "rate": 2.0, "amount": 20.0}
+    ],
+    "total": 42.5,
+    "payments": [
+      {"mode_of_payment": "Cash", "amount": 42.5}
+    ],
+    "status": "Paid"
+  },
+  {
+    "invoice_id": "POS-INV-2025-002",
+    "posting_date": "2025-04-17",
+    "posting_time": "10:30:00",
+    "customer": "Sophie Laurent",
+    "cashier": "Marie Dupont",
+    "pos_profile": "Floravi Shop 1",
+    "items": [
+      {"item_code": "LILY-WHT-002", "item_name": "White Lily", "qty": 3, "rate": 6.0, "amount": 18.0},
+      {"item_code": "WRAP-GIFT-001", "item_name": "Gift Wrapping", "qty": 1, "rate": 3.5, "amount": 3.5}
+    ],
+    "total": 21.5,
+    "payments": [
+      {"mode_of_payment": "Card", "amount": 21.5}
+    ],
+    "status": "Paid"
+  },
+  {
+    "invoice_id": "POS-INV-2025-003",
+    "posting_date": "2025-04-17",
+    "posting_time": "11:45:00",
+    "customer": "Walk-in Customer",
+    "cashier": "Marie Dupont",
+    "pos_profile": "Floravi Shop 1",
+    "items": [
+      {"item_code": "ROSE-RED-001", "item_name": "Red Rose Bundle", "qty": 2, "rate": 4.5, "amount": 9.0}
+    ],
+    "total": 9.0,
+    "payments": [
+      {"mode_of_payment": "Cash", "amount": 10.0}
+    ],
+    "status": "Paid"
+  },
+  {
+    "invoice_id": "POS-INV-2025-004",
+    "posting_date": "2025-04-17",
+    "posting_time": "14:00:00",
+    "customer": "Jean Martin",
+    "cashier": "Pierre Bernard",
+    "pos_profile": "Floravi Shop 1",
+    "items": [
+      {"item_code": "ORCH-PNK-005", "item_name": "Pink Orchid", "qty": 1, "rate": 25.0, "amount": 25.0},
+      {"item_code": "VASE-CER-002", "item_name": "Ceramic Vase", "qty": 1, "rate": 15.0, "amount": 15.0}
+    ],
+    "total": 40.0,
+    "payments": [
+      {"mode_of_payment": "Card", "amount": 30.0},
+      {"mode_of_payment": "Cash", "amount": 10.0}
+    ],
+    "status": "Paid"
+  },
+  {
+    "invoice_id": "POS-INV-2025-005",
+    "posting_date": "2025-04-17",
+    "posting_time": "16:20:00",
+    "customer": "Walk-in Customer",
+    "cashier": "Pierre Bernard",
+    "pos_profile": "Floravi Shop 1",
+    "items": [
+      {"item_code": "SUNF-LRG-004", "item_name": "Large Sunflower", "qty": -2, "rate": 5.0, "amount": -10.0}
+    ],
+    "total": -10.0,
+    "payments": [
+      {"mode_of_payment": "Cash", "amount": -10.0}
+    ],
+    "status": "Paid"
+  }
+]

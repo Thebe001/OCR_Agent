@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Floravi Daily Close Agent</title>
+    <style>
+      :root {
+        --bg: #f4f7f2;
+        --panel: #ffffff;
+        --ink: #1b241f;
+        --muted: #5f6e64;
+        --line: #d7dfd8;
+        --brand: #176b52;
+        --brand-dark: #0f4d3d;
+        --ok: #1a7f50;
+        --warn: #8a6b00;
+        --err: #9a2f2f;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+      }
+      .wrap {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 26px 18px 32px;
+      }
+      .hero h1 { margin: 0 0 8px; font-size: 34px; }
+      .hero p { margin: 0; color: var(--muted); }
+      .layout {
+        margin-top: 18px;
+        display: grid;
+        grid-template-columns: 340px 1fr;
+        gap: 16px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 12px 24px rgba(24, 36, 31, 0.05);
+      }
+      .panel h2 { margin: 0 0 12px; font-size: 18px; }
+      label { display: grid; gap: 6px; font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+      input[type="text"], input[type="date"] {
+        min-height: 38px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 8px 10px;
+      }
+      input[type="checkbox"] { margin-right: 8px; }
+      .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+      button {
+        border: 0;
+        border-radius: 8px;
+        min-height: 38px;
+        padding: 8px 12px;
+        background: linear-gradient(180deg, #1b7e5f, var(--brand));
+        color: #fff;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      button:hover { background: linear-gradient(180deg, #20896a, var(--brand-dark)); }
+      button.secondary { background: #dce4de; color: #223228; }
+      .status { margin-top: 10px; color: var(--muted); min-height: 20px; }
+
+      .source-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #26453a;
+        background: #e8f4ee;
+        border: 1px solid #9bc8b0;
+        border-radius: 999px;
+        padding: 5px 9px;
+        margin-bottom: 10px;
+      }
+
+      .result-scroll {
+        border-radius: 10px;
+        min-height: 460px;
+        max-height: 580px;
+        overflow: auto;
+        border: 1px solid var(--line);
+        background: #fcfdfb;
+        padding: 12px;
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .card {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: #fff;
+        padding: 10px;
+      }
+
+      .card .k { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+      .card .v { font-size: 20px; font-weight: 800; }
+
+      .ok { color: var(--ok); }
+      .warn { color: var(--warn); }
+      .err { color: var(--err); }
+
+      .table-wrap {
+        overflow: auto;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: #fff;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 640px;
+      }
+
+      th, td {
+        padding: 8px 10px;
+        border-bottom: 1px solid #e6ece7;
+        text-align: left;
+        vertical-align: top;
+        font-size: 13px;
+      }
+
+      th { background: #edf4ef; }
+
+      .anomaly-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .anomaly {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: #fff;
+        padding: 10px;
+      }
+
+      .badge {
+        display: inline-block;
+        border-radius: 999px;
+        padding: 3px 8px;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+      }
+
+      .badge.critical { background: #fde9e9; color: #932a2a; border: 1px solid #e7b3b3; }
+      .badge.high { background: #fff1df; color: #8f5f00; border: 1px solid #e9cb9a; }
+      .badge.medium { background: #fff7db; color: #8a6b00; border: 1px solid #ead99a; }
+      .badge.low { background: #e9f6ed; color: #1f7a4f; border: 1px solid #afddc3; }
+
+      .empty {
+        color: var(--muted);
+        font-size: 14px;
+        padding: 8px;
+      }
+
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .cards { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <section class="hero">
+        <h1>Floravi Daily Close Agent</h1>
+        <p>Test daily-close flow with mock POS data, similar to the OCR /agent page.</p>
+      </section>
+
+      <section class="layout">
+        <aside class="panel">
+          <h2>Controls</h2>
+          <label>
+            Date
+            <input id="dateInput" type="date" value="2025-04-17" />
+          </label>
+          <label>
+            POS Profile (optional)
+            <input id="profileInput" type="text" value="Floravi Shop 1" />
+          </label>
+          <label>
+            <input id="forceCloseInput" type="checkbox" />
+            Force close session
+          </label>
+
+          <div class="row">
+            <button id="btnTransactions" type="button">Get Transactions</button>
+            <button id="btnValidate" type="button">Validate Totals</button>
+          </div>
+          <div class="row">
+            <button id="btnAnomalies" type="button">Detect Anomalies</button>
+            <button id="btnClose" type="button">Close Session</button>
+          </div>
+          <div class="row">
+            <button id="btnFlow" type="button">Run Full Flow</button>
+            <button id="btnClear" type="button" class="secondary">Clear</button>
+          </div>
+          <p id="status" class="status">Ready.</p>
+        </aside>
+
+        <section class="panel">
+          <h2>Result</h2>
+          <div id="sourceChip" class="source-chip" style="display:none"></div>
+          <div id="output" class="result-scroll">
+            <div class="empty">No execution yet.</div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="/static/daily_close.js"></script>
+  </body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "date": "2025-04-17",
+  "pos_profile": "Floravi Shop 1",
+  "expected_cash_in_drawer": 200.0,
+  "actual_cash_counted": 195.5,
+  "payment_summary": [
+    {"mode_of_payment": "Cash", "total_collected": 52.5},
+    {"mode_of_payment": "Card", "total_collected": 51.5}
+  ],
+  "opening_balance": 150.0
+}
